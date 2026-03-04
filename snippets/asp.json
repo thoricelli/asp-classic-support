@@ -257,5 +257,12 @@
 			"''' <param name=\"$2\">$3</param>"
 		],
 		"description": "Comment-Based-Help"
+	},
+	"dim statement": {
+		"prefix": "Dim",
+		"body": [
+			"Dim ${1:Name}",
+			"$1 = ${2:Value}"
+		]
 	}
 }

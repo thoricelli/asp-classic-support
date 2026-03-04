@@ -4,6 +4,7 @@ import * as PATTERNS from "./patterns";
 import { currentDocSymbols, getDocsForLine } from "./symbols";
 import { getRegionsInsideRange, positionIsInsideAspRegion, replaceCharacter } from "./region";
 import { should } from "chai";
+import completions from "./definitions";
 
 /** Returns true if an object was found... or something? */
 function getObjectMembersCode(doc: TextDocument, objectsToAdd : CompletionItem[], objectName: string): boolean {
@@ -185,6 +186,8 @@ function provideCompletionItems(doc: TextDocument, position: Position): Completi
       results.push(completion);
     }
   }
+
+  results.push(...completions)
 
   return results;
 
