@@ -5,35 +5,15 @@ import { currentDocSymbols, getDocsForLine } from "./symbols";
 import { getRegionsInsideRange, positionIsInsideAspRegion, replaceCharacter } from "./region";
 import { should } from "chai";
 import completions from "./definitions";
+import { AspSymbol } from "./types";
 
-/** Returns true if an object was found... or something? */
-function getObjectMembersCode(doc: TextDocument, objectsToAdd : CompletionItem[], objectName: string): boolean {
 
-  for(const symbol of [...currentDocSymbols(doc.fileName), ...builtInSymbols]) {
+function getObjectMembers(doc: TextDocument, objectName: string): AspSymbol[] {
+  const allSymbols = [...currentDocSymbols(doc.fileName), ...builtInSymbols];
 
-    if(symbol.symbol.kind === SymbolKind.Class && symbol.symbol.name.toLowerCase() === objectName.toLowerCase()) {
+  const objectSymbol = allSymbols.find(e => e?.symbol?.name?.toLowerCase() == objectName.toLocaleLowerCase());
 
-      for(const item of symbol.symbol.children) {
-
-        const completion = getCompletionFromSymbol(item);
-
-        const documentation = getDocumentationForSymbol(doc, item, objectName);
-
-        if(documentation) {
-          completion.documentation = new MarkdownString(documentation);
-        }
-
-        // We've already added it, go on
-        if(objectsToAdd.some(i => i.label === completion.label && i.kind == completion.kind )) continue;
-
-        objectsToAdd.push(completion);
-      }
-
-      return true;
-    }
-  }
-
-  return false;
+  return allSymbols.filter(e => e?.parentName?.toLocaleLowerCase() == objectSymbol?.set?.toLocaleLowerCase());
 }
 
 function getDocumentationForSymbol(doc: TextDocument, symbol: DocumentSymbol, parentName: string): string {
@@ -136,29 +116,12 @@ function provideCompletionItems(doc: TextDocument, position: Position): Completi
 
     output.appendLine(`Dot typed for object: ${objectName}`);
 
-    // eslint-disable-next-line no-empty
-    if (getObjectMembersCode(doc, results, objectName)) {
+    const classAspSymbols: AspSymbol[] = getObjectMembers(doc, objectName);
 
-    }
-    else {
+    if (classAspSymbols.length <= 0)
+      return [];
 
-			// Fall back to using all available symbols
-			for(const symbol of [...currentDocSymbols(doc.fileName), ...builtInSymbols]) {
-
-				const completion = getCompletionFromSymbol(symbol.symbol);
-
-				if(!symbol.isTopLevel) continue;
-
-        if(symbol.documentation && symbol.documentation.summary) {
-          completion.documentation = new MarkdownString(symbol.documentation.summary);
-        }
-
-				if(results.some(i => i.label === completion.label && i.kind == completion.kind )) continue;
-
-				results.push(completion);
-			}
-
-    }
+    return classAspSymbols.map(e => getCompletionFromSymbol(e.symbol));
   }
   else {
 

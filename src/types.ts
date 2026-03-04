@@ -10,6 +10,8 @@ export interface AspSymbol {
 
 	/** The definition of the symbol, e.g. `Dim someVariable` or `Class MyClass` */
 	definition?: string;
+	/** Declaration set. */
+	set?: string;
 
 	parentName?: string;
 
@@ -44,4 +46,30 @@ export interface AspRegion {
 export interface VirtualPath {
 	virtualPath: string;
 	physicalPath: string;
+}
+
+export interface ComGetMembers {
+	Name: string;
+	MemberType: PSMemberType,
+	Definition: string;
+}
+
+export enum PSMemberType {
+	AliasProperty = 1,
+	CodePropery = 2,
+	Property = 4,
+	NoteProperty = 8,
+	ScriptProperty = 16,
+	PropertySet = 32,
+	Method = 64,
+	CodeMethod = 128,
+	ScriptMethod = 256,
+	Methods = 448,
+	ParameterizedProperty = 512,
+	MemberSet = 1024,
+	Event = 2048,
+	Dynamic = 4096,
+	InferredProperty = 8192,
+	Properties = 8223,
+	All = 16383
 }

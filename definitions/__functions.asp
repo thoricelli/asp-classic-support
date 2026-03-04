@@ -31,48 +31,63 @@ End Function
 Function CBool(expr) ' As Boolean
 End Function
 
+''' <summary>Converts an expression to type Byte.</summary>
 Function CByte(expr) ' As Byte
 End Function
 
+''' <summary>Converts an expression to type Currency.</summary>
 Function CCur(expr) ' As Currency
 End Function
 
+''' <summary>Converts a valid date and time expression to type Date, and returns the result.</summary>
 Function CDate(expr) ' As Date
 End Function
 
+''' <summary>Converts an expression to type Double.</summary>
 Function CDbl(expr) ' As Double
 End Function
 
+''' <summary>Returns a String containing the character associated with the specified character code.</summary>
 Function Chr(charcode)
 End Function
 
+''' <summary>The ChrB function is used with byte data contained in a String. Instead of returning a character, which may be one or two bytes, ChrB always returns a single byte.</summary>
 Function ChrB(charcode)
 End Function
 
+''' <summary>Converts the specified character code to a Unicode character.</summary>
 Function ChrW(charcode)
 End Function
 
+''' <summary>The CInt function converts an expression to type Integer.</summary>
 Function CInt(expr) ' As Integer
 End Function
 
+''' <summary>The CLng function converts an expression to type Long.</summary>
 Function CLng(expr) ' As Long
 End Function
 
+''' <summary>The Cos function returns the cosine of a specified number (angle).</summary>
 Function Cos(number)
 End Function
 
+''' <summary>The CreateObject function creates an object of a specified type.</summary>
 Function CreateObject(classname)
 End Function
 
+''' <summary>The CreateObject function creates an object of a specified type.</summary>
 Function CreateObject(classname, location)
 End Function
 
+''' <summary>The CSng function converts an expression to type Single.</summary>
 Function CSng(expr) ' As Single
 End Function
 
+''' <summary>The CStr function converts an expression to type String.</summary>
 Function CStr(expr) ' As String
 End Function
 
+''' <summary>The Date function returns the current system date.</summary>
 Function Date()
 End Function
 

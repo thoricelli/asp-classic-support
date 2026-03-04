@@ -6,7 +6,8 @@ import * as path from "path";
 import { getImportedFiles, includes } from "./includes";
 import { builtInSymbols, output } from "./extension";
 import { getAspRegions, getRegionsInsideRange, positionIsInsideAspRegion, regionIsInsideAspRegion, replaceCharacter } from "./region";
-import { AspDocumentation, AspSymbol, VirtualPath } from "./types";
+import { AspDocumentation, AspSymbol, ComGetMembers, VirtualPath } from "./types";
+import { exec } from "child_process";
 
 const showVariableSymbols: boolean = workspace.getConfiguration("asp").get<boolean>("showVariableSymbols");
 const showParameterSymbols: boolean = workspace.getConfiguration("asp").get<boolean>("showParameterSymbols");
@@ -216,7 +217,8 @@ function getSymbolsForDocument(doc: TextDocument, collection: Set<AspSymbol>): D
 							isTopLevel: false,
 							sourceFile: fileName,
 							sourceFilePath: doc.fileName,
-							isBuiltIn: isBuiltIn
+							isBuiltIn: isBuiltIn,
+							set: matches[3]
 						};
 
 						// If we don't have this variable in our list provided yet...
@@ -444,8 +446,11 @@ export function getSymbolAtPosition(doc: TextDocument, position: Position): AspS
 
   const word: string = wordRange ? doc.getText(wordRange) : "";
 
-	const allSymbols = new Set([...builtInSymbols, ...currentDocSymbols(doc.fileName)]);
+	const allSymbols = [...builtInSymbols, ...currentDocSymbols(doc.fileName)];
 
+	//TODO: Performance
+	const parentSymbol = allSymbols.find(e => e?.symbol?.name?.toLowerCase() == parentName?.toLowerCase())
+	
 	for(const item of allSymbols) {
 		const symbol = item.symbol;
 
@@ -454,12 +459,12 @@ export function getSymbolAtPosition(doc: TextDocument, position: Position): AspS
 		}
 
 		// We have a parent but the candidate doesn't
-		if(parentName && !item.parentName) {
+		if(parentName && !parentSymbol?.set) {
 			continue;
 		}
 
 		// We have a parent name but the candidate doesn't match
-		if(parentName && item.parentName.toLowerCase() != parentName.toLowerCase()) {
+		if(parentName && item.parentName.toLowerCase() != parentSymbol?.set.toLowerCase()) {
 			continue;
 		}
 
@@ -517,6 +522,35 @@ export function getParentOfMember(doc: TextDocument, position: Position): string
 	const precedingWordRange = doc.getWordRangeAtPosition(new Position(position.line, precedingCharacterIndex - 1));
 
 	return doc.getText(precedingWordRange);
+}
+
+export function getComMembers(progID: string) : Promise<AspSymbol[]> {
+
+	return new Promise((resolve, reject) => {
+		exec(`powershell -Command \"$com = New-Object -Com '${progID}'; $com | Get-Member | Select-Object Name, MemberType, Definition | ConvertTo-Json -Depth 2; [System.Runtime.InteropServices.Marshal]::ReleaseComObject($com) | Out-Null\"`, (error, stdout, stderr) => {
+			let membersMap: ComGetMembers[] = JSON.parse(stdout);
+
+			resolve(membersMap.map(e => {
+					let symbol: AspSymbol = {
+						isTopLevel: true,
+						sourceFile: "",
+						sourceFilePath: "",
+						isBuiltIn: true,
+
+						symbol: {
+							name: e.Definition,
+							detail: null,
+							kind: SymbolKind.Function,
+							range: null,
+							selectionRange: null,
+							children: []
+						}
+					};
+
+					return symbol;
+				}))
+		})
+	})
 }
 
 export default languages.registerDocumentSymbolProvider(

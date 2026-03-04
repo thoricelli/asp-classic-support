@@ -21,7 +21,7 @@
     "documentation": ""
   },
   "Dim": {
-    "documentation": ""
+    "documentation": "Declares a variable and allocates storage space"
   },
   "Do": {
     "documentation": ""
@@ -136,5 +136,8 @@
   },
   "With": {
     "documentation": ""
+  },
+  "Set": {
+    "documentation": "Assigns an object to a variable"
   }
 }
