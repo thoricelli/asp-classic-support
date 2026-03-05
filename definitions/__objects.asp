@@ -627,6 +627,10 @@ Class Response
 	Property Get Charset
 	End Property
 
+	''' <summary>Sets the code page for data in the intrinsic objects for one response. The code page specifies for the server how to encode characters for different languages.</summary>
+	Property Get CodePage
+	End Property
+
 	''' <summary>[Sets the HTTP content type for the Response object.](https://www.w3schools.com/asp/prop_contenttype.asp)</summary>
 	Property Get ContentType
 	End Property
@@ -642,9 +646,13 @@ Class Response
 	''' <summary>(Indicates if the client has disconnected from the server.)[https://www.w3schools.com/asp/prop_isclientconnected.asp]</summary>
 	Property Get IsClientConnected
 	End Property
+
+	''' <summary>Sets the LCID for data for one response. The LCID refers to how dates, times, and currency are formatted for a specific geographical locale.</summary>
+	Property Get LCID
+	End Property
 	
 	''' <summary>[Appends a value to the PICS label response header.](https://www.w3schools.com/asp/prop_pics.asp)</summary>
-	Property Get Pics
+	Property Get PICS
 	End Property
 	
 	''' <summary>[Specifies the value of the status line returned by the server.](https://www.w3schools.com/asp/prop_status.asp)</summary>
@@ -737,85 +745,128 @@ End Class
 ''' <summary>You can use the Server object to access methods and properties on the server. Most of these methods and properties serve as utility functions.</summary>
 Class Server
 
-''' <summary>The CreateObject method creates an instance of a server component. If the component has implemented the OnStartPage and OnEndPage methods, the OnStartPage method is called at this time.</summary>
-''' <param name="progID">Specifies the type of object to create. The format for progID is [Vendor.] Component[ .Version].</param>
-Function CreateObject(progID)
-End Function
+	''' <summary>The CreateObject method creates an instance of a server component. If the component has implemented the OnStartPage and OnEndPage methods, the OnStartPage method is called at this time.</summary>
+	''' <param name="progID">Specifies the type of object to create. The format for progID is [Vendor.] Component[ .Version].</param>
+	Function CreateObject(progID)
+	End Function
 
-''' <summary>The Execute method calls an .asp file, and processes it as if it were part of the calling ASP script. The Execute method is similar to a procedure call in many programming languages.</summary>
-''' <param name="Path">A string specifying the location of the .asp file to execute. The Path parameter may be for either an absolute or a relative path. If Path is absolute, it must map to an ASP script in the same application as the calling .asp file. Path can be a string variable name that is set at run-time. The Path parameter must not contain a query string, or IIS returns an error.</param>
-Function Execute(Path)
-End Function
+	''' <summary>The Execute method calls an .asp file, and processes it as if it were part of the calling ASP script. The Execute method is similar to a procedure call in many programming languages.</summary>
+	''' <param name="Path">A string specifying the location of the .asp file to execute. The Path parameter may be for either an absolute or a relative path. If Path is absolute, it must map to an ASP script in the same application as the calling .asp file. Path can be a string variable name that is set at run-time. The Path parameter must not contain a query string, or IIS returns an error.</param>
+	Function Execute(Path)
+	End Function
 
-''' <summary>The GetLastError method returns an ASPError Object describing the error condition that occurred. This method is available only before the .asp file has sent any content to the client.</summary>
-Function GetLastError()
-End Function
+	''' <summary>The GetLastError method returns an ASPError Object describing the error condition that occurred. This method is available only before the .asp file has sent any content to the client.</summary>
+	''' <returns type="ASPError">DefDef</returns>
+	Function GetLastError()
+	End Function
+	
+	''' <summary>The HTMLEncode method applies HTML encoding to a specified string. This is useful as a quick method of encoding form data and other client request data before using it in your Web application. Encoding data converts potentially unsafe characters to their HTML-encoded equivalent.</summary>
+	''' <param name="string">Specifies the string to encode.</param>
+	Function HTMLEncode(string)
+	End Function
 
-''' <summary>The HTMLEncode method applies HTML encoding to a specified string. This is useful as a quick method of encoding form data and other client request data before using it in your Web application. Encoding data converts potentially unsafe characters to their HTML-encoded equivalent.</summary>
-''' <param name="string">Specifies the string to encode.</param>
-Function HTMLEncode(string)
-End Function
+	''' <summary>The MapPath method maps the specified relative or virtual path to the corresponding physical directory on the server.</summary>
+	''' <param name="Path">Specifies the relative or virtual path to map to a physical directory. If Path starts with either a forward (/) or backward slash (\), the MapPath method returns a path as if Path were a full, virtual path. If Path doesn't start with a slash, the MapPath method returns a path relative to the directory of the .asp file being processed.</param>
+	Function MapPath(Path)
+	End Function
 
-''' <summary>The MapPath method maps the specified relative or virtual path to the corresponding physical directory on the server.</summary>
-''' <param name="Path">Specifies the relative or virtual path to map to a physical directory. If Path starts with either a forward (/) or backward slash (\), the MapPath method returns a path as if Path were a full, virtual path. If Path doesn't start with a slash, the MapPath method returns a path relative to the directory of the .asp file being processed.</param>
-Function MapPath(Path)
-End Function
+	''' <summary>The Transfer method sends all of the information that has been assembled for processing by one .asp file to a second .asp file.</summary>
+	''' <param name="Path">The location of the .asp file to which control should be transferred.</param>
+	Function Transfer(Path)
+	End Function
 
-''' <summary>The Transfer method sends all of the information that has been assembled for processing by one .asp file to a second .asp file.</summary>
-''' <param name="Path">The location of the .asp file to which control should be transferred.</param>
-Function Transfer(Path)
-End Function
+	''' <summary>The URLEncode method applies URL encoding rules, including escape characters, to a specified string.</summary>
+	''' <param name="string">Specifies the string to encode.</param>
+	Function URLEncode(string)
+	End Function
 
-''' <summary>The URLEncode method applies URL encoding rules, including escape characters, to a specified string.</summary>
-''' <param name="string">Specifies the string to encode.</param>
-Function URLEncode(string)
-End Function
+	''' <summary>The ScriptTimeout property specifies the maximum amount of time that a script can run before it is terminated.</summary>
+	Property Get ScriptTimeout()
+	End Property
 
-''' <summary>The ScriptTimeout property specifies the maximum amount of time that a script can run before it is terminated.</summary>
-Property Get ScriptTimeout()
-End Property
+	End Class
+
+	''' <summary>You can use the Session object to store information needed for a particular user session. Variables stored in the Session object are not discarded when the user jumps between pages in the application; instead, these variables persist for the entire user session.</summary>
+	Class Session
+
+	''' <summary>The Abandon method destroys all the objects stored in a Session object and releases their resources. If you do not call the Abandon method explicitly, the server destroys these objects when the session times out.</summary>
+	Function Abandon()
+	End Function
+
+	''' <summary>Contains the items that you have added to the session by using script commands.</summary>
+	Property Get Contents(Key)
+	End Property
+
+	''' <summary>Sets the code page for data in the intrinsic objects for an entire session. The code page specifies to the server how to encode characters for different languages.</summary>
+	Property Get CodePage
+	End Property
+
+	''' <summary>Sets the LCID for data for an entire session. The LCID refers to how dates, times, and currency are formatted for a specific geographical locale.</summary>
+	Property Get LCID
+	End Property
+
+	''' <summary>Returns the session identification for this user.</summary>
+	Property Get SessionID
+	End Property
+
+	''' <summary>Contains the objects created by using the <OBJECT> tag and given session scope.</summary>
+	Property Get StaticObjects(Key)
+	End Property
+
+	''' <summary>The time-out period for the session state for this application, in minutes.</summary>
+	Property Get TimeOut(nMinutes)
+	End Property
 
 End Class
 
-''' <summary>You can use the Session object to store information needed for a particular user session. Variables stored in the Session object are not discarded when the user jumps between pages in the application; instead, these variables persist for the entire user session.</summary>
-Class Session
+Class ObjectContext
 
-''' <summary>The Abandon method destroys all the objects stored in a Session object and releases their resources. If you do not call the Abandon method explicitly, the server destroys these objects when the session times out.</summary>
-Function Abandon()
-End Function
+	''' <summary>Declares that the transaction initiated by the script has not completed and that the resources should not be updated.</summary>
+	Function SetAbort()
+	End Function
 
-''' <summary>Contains the items that you have added to the session by using script commands.</summary>
-Property Get Contents(Key)
-End Property
+	''' <summary>Declares that the script is not aware of any reason for the transaction not to complete. If all components participating in the transaction also call SetComplete, the transaction completes.</summary>
+	Function SetComplete()
+	End Function
+End Class
 
-''' <summary>Sets the code page for data in the intrinsic objects for an entire session. The code page specifies to the server how to encode characters for different languages.</summary>
-Property Get CodePage
-End Property
+Class ASPError
 
-''' <summary>Sets the LCID for data for an entire session. The LCID refers to how dates, times, and currency are formatted for a specific geographical locale.</summary>
-Property Get LCID
-End Property
+	''' <summary>Returns an error code generated by IIS.</summary>
+	Property Get ASPCode
+	End Property
 
-''' <summary>Returns the session identification for this user.</summary>
-Property Get SessionID
-End Property
+	''' <summary>Returns a more detailed description of the error, if it is an ASP-related error</summary>
+	Property Get ASPDescription
+	End Property
 
-''' <summary>Contains the objects created by using the <OBJECT> tag and given session scope.</summary>
-Property Get StaticObjects(Key)
-End Property
+	''' <summary>Indicates if the source of the error was internal to ASP, the scripting language, or an object.</summary>
+	Property Get Category
+	End Property
 
-''' <summary>The time-out period for the session state for this application, in minutes.</summary>
-Property Get TimeOut(nMinutes)
-End Property
+	''' <summary>Indicates the column position within the .asp file that generated the error.</summary>
+	Property Get Column
+	End Property
 
-''' <summary>Occurs when a session is abandoned or times out.</summary>
-Sub Session_OnStart()
-End Sub
+	''' <summary>Returns a short description of the error.</summary>
+	Property Get Description
+	End Property
 
-''' <summary>Occurs when the server creates a new session.</summary>
-Sub Session_OnEnd()
-End Sub
+	''' <summary>Indicates the name of the .asp file that was being processed when the error occurred.</summary>
+	Property Get File
+	End Property
 
+	''' <summary>Indicates the line within the .asp file that generated the error.</summary>
+	Property Get Line
+	End Property
+	
+	''' <summary>Returns the standard COM error code.</summary>
+	Property Get Number
+	End Property
+
+	''' <summary>Returns the actual source code, when available, of the line that caused the error.</summary>
+	Property Get Source
+	End Property
 End Class
 
 #End Region IIS

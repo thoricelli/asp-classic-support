@@ -91,6 +91,14 @@ export const COMMENT_SUMMARY = /(?:\s*<summary>\s*)([^<]*)(?:<\/summary>)?/img
  */
 export const PARAM_SUMMARIES = /(?:\s*<param name=["'](\w+)["'].*?>\s*)([^<]*)(?:<\/param>)?/img
 
+/**
+ * Matches a return parameter.
+ * 
+ * 1. Return type
+ * 2. Return description
+ */
+export const RETURN_SUMMARY = /(?:\s*<returns(?:\s+type=["'](\w+)["'])?.*?>\s*)([^<]*)(?:<\/returns>)?/im
+
 export function PARAM_SUMMARY(input: string, parameterName: string): RegExpExecArray {
   return new RegExp(`'''\\s*<param name=["']${parameterName}["']>(.*)<\\/param>`, "i").exec(input);
 }

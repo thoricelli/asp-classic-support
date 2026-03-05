@@ -30,6 +30,8 @@ export interface AspDocumentation {
 	rawSummary: string;
 	summary?: string;
 	parameters?: AspParameterDocumentation[];
+	returnSummary?: string;
+	returnType?: string;
 }
 
 export interface AspParameterDocumentation {

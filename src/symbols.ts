@@ -139,7 +139,7 @@ function getSymbolsForDocument(doc: TextDocument, collection: Set<AspSymbol>): D
 
 			aspSymbol.sourceFile = fileName;
 
-      let matches: RegExpMatchArray | null = [];
+      let matches: RegExpMatchArray | [] = [];
 
       if ((matches = CLASS.exec(lineText)) !== null) {
 
@@ -344,7 +344,7 @@ export function getDocsForLine(doc: TextDocument, line: TextLine): AspDocumentat
 		comment += `${sortedLine.text.replace(/^\s*'+/, '')}  \n`;
 	}
 
-	let matches: RegExpMatchArray | null = [];
+	let matches: RegExpMatchArray | [] = [];
 
 	// Initialize documentation with the raw comment text in case we have no "real" matches below (e.g. we have just a plain comment and not ''' summary)
 	const documentation: AspDocumentation = { rawSummary: comment };
@@ -366,6 +366,13 @@ export function getDocsForLine(doc: TextDocument, line: TextLine): AspDocumentat
 
 			documentation.parameters.push({ name: matches[1], summary: matches[2] })
 		}
+	}
+
+	const returnMatch = PATTERNS.RETURN_SUMMARY.exec(comment);
+
+	if (returnMatch && (returnMatch[2] || returnMatch[1])) {
+		documentation.returnSummary = returnMatch[2];
+		documentation.returnType = returnMatch[1];
 	}
 
 	return documentation;
@@ -487,12 +494,12 @@ export function getDocumentMarkdown(symbol: AspSymbol): string {
 
 	var text = `---\n${symbol.documentation.summary ?? symbol.documentation.rawSummary}`;
 
-	if(!symbol.documentation.parameters){
-		return text;
+	for(const parameterDoc of symbol.documentation?.parameters ?? []) {
+		text += `\n\n _@param_ \`${parameterDoc.name}\` — ${parameterDoc.summary}`;
 	}
 
-	for(const parameterDoc of symbol.documentation.parameters) {
-		text += `\n\n _@param_ \`${parameterDoc.name}\` — ${parameterDoc.summary}`;
+	if (symbol.documentation?.returnSummary) {
+		text += `\n\n _@returns_ \`${symbol.documentation?.returnType}\` — ${symbol.documentation?.returnSummary}`
 	}
 
 	return text;

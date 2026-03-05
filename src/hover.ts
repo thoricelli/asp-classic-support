@@ -23,6 +23,9 @@ async function provideHover(doc: TextDocument, position: Position): Promise<Hove
 
 			let definition = item.definition ?? item.symbol.name;
 
+			if (item?.documentation?.returnType)
+				definition += " = " + item?.documentation?.returnType;
+
 			// If this is a prop/function, put the parent name in front of the symbol name
 			if (item.parentName && (item.symbol.kind === SymbolKind.Function || item.symbol.kind === SymbolKind.Property)) {
 				definition = definition.replace(item.symbol.name, `${item.parentName}.${item.symbol.name}`);

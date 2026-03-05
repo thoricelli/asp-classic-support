@@ -1,4 +1,4 @@
-import { languages, CompletionItem, CompletionItemKind, TextDocument, Position, SymbolKind, DocumentSymbol, Uri, commands, MarkdownString } from "vscode";
+import { languages, CompletionItem, CompletionItemKind, TextDocument, Position, SymbolKind, DocumentSymbol, Uri, commands, MarkdownString, CompletionList } from "vscode";
 import { builtInSymbols, output } from "./extension"
 import * as PATTERNS from "./patterns";
 import { currentDocSymbols, getDocsForLine } from "./symbols";
@@ -11,9 +11,14 @@ import { AspSymbol } from "./types";
 function getObjectMembers(doc: TextDocument, objectName: string): AspSymbol[] {
   const allSymbols = [...currentDocSymbols(doc.fileName), ...builtInSymbols];
 
-  const objectSymbol = allSymbols.find(e => e?.symbol?.name?.toLowerCase() == objectName.toLocaleLowerCase());
+  let objectSymbol = allSymbols.find(e => e?.symbol?.name?.toLowerCase() == objectName.toLowerCase());
 
-  return allSymbols.filter(e => e?.parentName?.toLocaleLowerCase() == objectSymbol?.set?.toLocaleLowerCase());
+  if (objectSymbol.set) {
+    objectSymbol = allSymbols.find(e => e?.symbol?.name?.toLowerCase() == objectSymbol?.set.toLowerCase())
+  }
+
+  //TODO: Replace with children.
+  return allSymbols.filter(e => e?.parentName?.toLowerCase() == objectSymbol?.symbol?.name?.toLowerCase() && e.sourceFilePath == objectSymbol.sourceFilePath);
 }
 
 function getDocumentationForSymbol(doc: TextDocument, symbol: DocumentSymbol, parentName: string): string {
@@ -26,7 +31,8 @@ function getDocumentationForSymbol(doc: TextDocument, symbol: DocumentSymbol, pa
   }
 }
 
-function getCompletionFromSymbol(symbol: DocumentSymbol): CompletionItem {
+function getCompletionFromSymbol(aspSymbol: AspSymbol): CompletionItem {
+  const symbol = aspSymbol.symbol;
   let kind: CompletionItemKind = CompletionItemKind.Variable;
 
   if(symbol.kind === SymbolKind.Variable) kind = CompletionItemKind.Variable;
@@ -34,16 +40,19 @@ function getCompletionFromSymbol(symbol: DocumentSymbol): CompletionItem {
   if(symbol.kind === SymbolKind.Function) kind = CompletionItemKind.Function;
   if(symbol.kind === SymbolKind.Class) kind = CompletionItemKind.Class;
 
-  return new CompletionItem(symbol.name, kind);
+  let completionSymbol = new CompletionItem(symbol.name, kind);
+  completionSymbol.detail = aspSymbol.definition;
+
+  return completionSymbol;
 }
 
-function provideCompletionItems(doc: TextDocument, position: Position): CompletionItem[] {
+function provideCompletionItems(doc: TextDocument, position: Position): CompletionList {
 
   const regionTest = positionIsInsideAspRegion(doc, position);
 
   // We're not in ASP, exit
   if(!regionTest.isInsideRegion) {
-    return [];
+    return new CompletionList([], false);
   }
 
   const line = doc.lineAt(position);
@@ -51,7 +60,7 @@ function provideCompletionItems(doc: TextDocument, position: Position): Completi
 
   // Remove completion offerings from commented lines
   if (line.text.charAt(line.firstNonWhitespaceCharacterIndex) === "'") {
-    return [];
+    return new CompletionList([], false);
   }
 
   const interiorRegions = getRegionsInsideRange(regionTest.regions, line.range);
@@ -85,7 +94,7 @@ function provideCompletionItems(doc: TextDocument, position: Position): Completi
 
   // No completion during writing a definition, still buggy
   if (PATTERNS.VAR_COMPLS.test(codeAtPosition)) {
-    return [];
+    return new CompletionList([], false);
   }
 
   // No completion within open string
@@ -97,7 +106,7 @@ function provideCompletionItems(doc: TextDocument, position: Position): Completi
 
   // No completion inside a quote block
   if (quoteCount % 2 === 1) {
-    return [];
+    return new CompletionList([], false);
   }
 
   const results: CompletionItem[] = [];
@@ -119,9 +128,9 @@ function provideCompletionItems(doc: TextDocument, position: Position): Completi
     const classAspSymbols: AspSymbol[] = getObjectMembers(doc, objectName);
 
     if (classAspSymbols.length <= 0)
-      return [];
+      return new CompletionList([], false);
 
-    return classAspSymbols.map(e => getCompletionFromSymbol(e.symbol));
+    return new CompletionList(classAspSymbols.map(e => getCompletionFromSymbol(e), false));
   }
   else {
 
@@ -132,7 +141,7 @@ function provideCompletionItems(doc: TextDocument, position: Position): Completi
 		// No DOT, use all available symbols
     for(const symbol of [...currentDocSymbols(doc.fileName), ...builtInSymbols]) {
 
-			const completion = getCompletionFromSymbol(symbol.symbol);
+			const completion = getCompletionFromSymbol(symbol);
 
       // if the symbol is not top level or does not live in this context, skip it
       if(!symbol.isTopLevel && symbol.parentName.toLowerCase() !== scope?.toLowerCase()) {
@@ -152,7 +161,7 @@ function provideCompletionItems(doc: TextDocument, position: Position): Completi
 
   results.push(...completions)
 
-  return results;
+  return new CompletionList(results, true);
 
   function getScope(): string {
 
