@@ -154,5 +154,8 @@
   },
   "Set": {
     "documentation": "Assigns an object to a variable"
+  },
+  "Nothing": {
+    "documentation": "Used to disassociate an object variable from any actual object or to indicate an uninitialized object value."
   }
 }
