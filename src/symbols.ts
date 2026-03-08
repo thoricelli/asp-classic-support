@@ -153,12 +153,12 @@ function getSymbolsForDocument(doc: TextDocument, collection: Set<AspSymbol>): D
 				documentation: getDocsForLine(doc, line),
 				isBuiltIn: isBuiltIn,
 			};
-			
+
 			//TODO: Performance
 			if (aspSymbol?.documentation?.returnType) {
 				let allSymbols = [...builtInSymbols, ...currentDocSymbols(doc.fileName)]
 				aspSymbol.type = allSymbols.findLast(e => e?.symbol?.name?.toLowerCase() == aspSymbol.documentation.returnType.toLowerCase());
-			}
+			} 
 
 			aspSymbol.sourceFile = fileName;
 
@@ -248,6 +248,11 @@ function getSymbolsForDocument(doc: TextDocument, collection: Set<AspSymbol>): D
 							isBuiltIn: isBuiltIn,
 							assign: matches[4]
 						};
+
+						if (matches[3]) {
+							let allSymbols = [...builtInSymbols, ...currentDocSymbols(doc.fileName)]
+							variableSymbol.type = aspSymbol?.type ?? allSymbols.findLast(e => e?.symbol?.name?.toLowerCase() == matches[3].toLowerCase());
+						}
 
 						// If we don't have this variable in our list provided yet...
             if (varList.indexOf(cleanVariableName) === -1 || !(/\bSet\b/i).test(matches[0])) {
@@ -487,7 +492,7 @@ export function getSymbolAtPosition(doc: TextDocument, position: Position): AspS
 
   const word: string = wordRange ? doc.getText(wordRange) : "";
 
-	const allSymbols = [...builtInSymbols, ...currentDocSymbols(doc.fileName), ...syntaxSymbols];
+	let allSymbols = [...builtInSymbols, ...currentDocSymbols(doc.fileName), ...syntaxSymbols];
 
 	let parentType = null;
 

@@ -10,7 +10,7 @@ import { AspSymbol } from "./types";
 async function getObjectMembers(doc: TextDocument, objectName: string): Promise<AspSymbol[]> {
   const allSymbols = [...currentDocSymbols(doc.fileName), ...builtInSymbols];
 
-  let objectSymbol = allSymbols.find(e => e?.symbol?.name?.toLowerCase() == objectName.toLowerCase());
+  let objectSymbol = allSymbols.find(e => e?.symbol?.name?.toLowerCase() == objectName.toLowerCase() && e.sourceFilePath == doc.fileName);
 
   let objectType = objectSymbol.type;
 
