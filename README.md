@@ -8,7 +8,6 @@ Then forked from https://github.com/NafisAli/asp-classic-support.
 This repository adds:
 - virtual / file import support (merged from NafisAli)
 - IIS classes such as: `Server`, `Session`, `Request`, `Response`
-- Object completion, eg: `Server.`...
 - COM mapping to objects, eg: `Server.CreateObject("ADODB.Connection")` is mapped to Connection class.
 - Return type documentation and return type infer with autocompletion.
 - General bugfixes and TextMate highlight changes.
