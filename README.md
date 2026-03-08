@@ -2,7 +2,7 @@
 
 An edit to the original ASP Classic Support extension with added features for IIS / COM autocompletion + general fixes.
 
-Original repository: https://github.com/zbecknell/asp-classic-support.
+Original repository: https://github.com/zbecknell/asp-classic-support.  
 Then forked from https://github.com/NafisAli/asp-classic-support.
 
 This repository adds:
