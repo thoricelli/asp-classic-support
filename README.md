@@ -1,17 +1,19 @@
-# ASP Classic Support - an extension for VS Code
+# ASP Classic Support
 
-Includes syntax highlighting, intellisense, and code navigation for VBScript inside Active Server Pages (ASP) files.
+An edit to the original ASP Classic Support extension with added features for IIS / COM autocompletion + general fixes.
 
-## Features
+Original repository: https://github.com/zbecknell/asp-classic-support.
+Then forked from https://github.com/NafisAli/asp-classic-support.
 
-The example below shows some initial features included. Support/docs for built-in VBScript functions is included but more is on the way for built-in ASP objects and functions.
+This repository adds:
+- virtual / file import support (merged from NafisAli)
+- IIS classes such as: `Server`, `Session`, `Request`, `Response`
+- Object completion, eg: `Server.`...
+- COM mapping to objects, eg: `Server.CreateObject("ADODB.Connection")` is mapped to Connection class.
+- Return type documentation and return type infer with autocompletion.
+- General bugfixes and TextMate highlight changes.
 
-![Outline](assets/docs/sample.gif)
-
-## Known Issues
-
-The extension is in a pre-release state that is hopefully more useful than no extension at all. Please feel free to submit issues for bugs and enhancements as you see fit!
-
-## Made Possible By
-
-This extension is derived directly from the [VBS extension by Serpen](https://marketplace.visualstudio.com/items?itemName=Serpen.vbsvscode) with syntax highlighting for ASP files from the [Classic ASP Syntaxes and Snippets extension by Jintae Joo](https://marketplace.visualstudio.com/items?itemName=jtjoo.classic-asp-html).
+TODO:
+- Performance fixes (this code was written quickly, just to get it to a point where it works).
+- Refactor.
+- Buggy, testing for bugs.

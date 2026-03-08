@@ -1,16 +1,33 @@
 /* eslint-disable complexity */
 /* eslint-disable max-statements */
-import { languages, SymbolKind, DocumentSymbol, Range, workspace, TextDocument, Position, TextLine } from "vscode";
-import * as PATTERNS from "./patterns";
 import * as path from "path";
-import { getImportedFiles, includes } from "./includes";
+import { CompletionItem, DocumentSymbol, languages, Position, Range, SnippetString, SymbolKind, TextDocument, TextLine, workspace } from "vscode";
+import syntaxSymbols from "./definitions";
+import comMappings from "./definitions/com_mappings.json";
 import { builtInSymbols, output } from "./extension";
+import { getImportedFiles, includes } from "./includes";
+import * as PATTERNS from "./patterns";
 import { getAspRegions, getRegionsInsideRange, positionIsInsideAspRegion, regionIsInsideAspRegion, replaceCharacter } from "./region";
-import { AspDocumentation, AspSymbol, ComGetMembers, VirtualPath } from "./types";
-import { exec } from "child_process";
+import { AspDocumentation, AspSymbol } from "./types";
 
 const showVariableSymbols: boolean = workspace.getConfiguration("asp").get<boolean>("showVariableSymbols");
 const showParameterSymbols: boolean = workspace.getConfiguration("asp").get<boolean>("showParameterSymbols");
+
+export const INCLUDE_SYMBOL = {
+	name: "#include",
+	label: "include"
+} as CompletionItem
+
+export const INCLUDE_TYPES = [
+	{
+		label: "file",
+		insertText: new SnippetString("file=\"$0\"")
+	} as CompletionItem,
+	{
+		label: "virtual",
+		insertText: new SnippetString("virtual=\"$0\"")
+	} as CompletionItem
+] as CompletionItem[]
 
 /**
  * Matches a Function
@@ -136,18 +153,31 @@ function getSymbolsForDocument(doc: TextDocument, collection: Set<AspSymbol>): D
 				documentation: getDocsForLine(doc, line),
 				isBuiltIn: isBuiltIn,
 			};
+			
+			//TODO: Performance
+			if (aspSymbol?.documentation?.returnType) {
+				let allSymbols = [...builtInSymbols, ...currentDocSymbols(doc.fileName)]
+				aspSymbol.type = allSymbols.findLast(e => e?.symbol?.name?.toLowerCase() == aspSymbol.documentation.returnType.toLowerCase());
+			}
 
 			aspSymbol.sourceFile = fileName;
 
       let matches: RegExpMatchArray | [] = [];
+			let hasNoEnd: boolean = false;
 
       if ((matches = CLASS.exec(lineText)) !== null) {
 
         name = matches[3];
 				aspSymbol.definition = matches[2];
         aspSymbol.symbol = new DocumentSymbol(name, "", SymbolKind.Class, line.range, line.range);
-
       }
+			else if ((matches = PATTERNS.MEMBER.exec(lineText)) !== null) {
+				name = matches[1];
+				aspSymbol.definition = matches[0];
+				aspSymbol.symbol = new DocumentSymbol(name, "", SymbolKind.Property, line.range, line.range);
+
+				hasNoEnd = true;
+			}
 			else if ((matches = FUNCTION.exec(lineText)) !== null) {
 
         name = matches[4];
@@ -192,14 +222,12 @@ function getSymbolsForDocument(doc: TextDocument, collection: Set<AspSymbol>): D
             });
           }
         }
-
       }
       else if ((matches = PROP.exec(lineText)) !== null) {
 
         name = matches[4];
 				aspSymbol.definition = matches[2];
         aspSymbol.symbol = new DocumentSymbol(name, null, SymbolKind.Property, line.range, line.range);
-
       }
       else if (showVariableSymbols) {
 
@@ -218,7 +246,7 @@ function getSymbolsForDocument(doc: TextDocument, collection: Set<AspSymbol>): D
 							sourceFile: fileName,
 							sourceFilePath: doc.fileName,
 							isBuiltIn: isBuiltIn,
-							set: matches[3]
+							assign: matches[4]
 						};
 
 						// If we don't have this variable in our list provided yet...
@@ -245,6 +273,14 @@ function getSymbolsForDocument(doc: TextDocument, collection: Set<AspSymbol>): D
               const r = new Range(line.lineNumber, 0, line.lineNumber, PATTERNS.VAR.lastIndex);
 
 							variableSymbol.symbol = new DocumentSymbol(cleanVariableName, "", symKind, r, r);
+
+							//Infer the type of this variable by what is being assigned into it
+							if (!matches[3] && matches[4]) {
+								variableSymbol.type = getSymbolFromAssignment(variableSymbol, [...builtInSymbols, ...collection]);
+							} else {
+								let symbols = [...builtInSymbols, ...collection];
+								variableSymbol.type = symbols.findLast(e => e?.symbol?.name?.toLowerCase() == matches[3]?.toLowerCase());
+							}
 
 							// If we're not inside a block this is a top-level variable
               if (blocks.length === 0) {
@@ -290,12 +326,11 @@ function getSymbolsForDocument(doc: TextDocument, collection: Set<AspSymbol>): D
 
 				aspSymbol.regionStartLine = line.lineNumber;
 
-				// This indicates we are inside a function/sub/class with the symbol being the parent
-        blocks.push(aspSymbol);
+				blocks.push(aspSymbol)
       }
 
 			// We should record the start and ending line of the block... really
-      if ((matches = PATTERNS.ENDLINE.exec(lineText)) !== null) {
+      if ((matches = PATTERNS.ENDLINE.exec(lineText)) !== null || hasNoEnd) {
         blocks.pop();
       }
     }
@@ -379,7 +414,6 @@ export function getDocsForLine(doc: TextDocument, line: TextLine): AspDocumentat
 }
 
 async function provideDocumentSymbols(doc: TextDocument): Promise<DocumentSymbol[]> {
-
 	try {
 		// Get built-in symbols only once
 		if (builtInSymbols.size <= 0) {
@@ -400,11 +434,11 @@ async function provideDocumentSymbols(doc: TextDocument): Promise<DocumentSymbol
 		// Clear out the current doc symbols to reload them
 		currentDocSymbols(doc.fileName).clear();
 		
-		// Get the local doc symbols
-		const localSymbols = getSymbolsForDocument(doc, currentDocSymbols(doc.fileName));
-
 		// Get the doc symbols of includes
 		await provideDocumentSymbolsForIncludes(doc, currentDocSymbols(doc.fileName));
+
+		// Get the local doc symbols
+		const localSymbols = getSymbolsForDocument(doc, currentDocSymbols(doc.fileName));
 
 		// We return the local symbols as they are displayed in the document Outline
 		return localSymbols;
@@ -453,25 +487,31 @@ export function getSymbolAtPosition(doc: TextDocument, position: Position): AspS
 
   const word: string = wordRange ? doc.getText(wordRange) : "";
 
-	const allSymbols = [...builtInSymbols, ...currentDocSymbols(doc.fileName)];
+	const allSymbols = [...builtInSymbols, ...currentDocSymbols(doc.fileName), ...syntaxSymbols];
+
+	let parentType = null;
 
 	//TODO: Performance
-	const parentSymbol = allSymbols.find(e => e?.symbol?.name?.toLowerCase() == parentName?.toLowerCase())
+	if (parentName) {
+		const parentSymbol = allSymbols.find(e => e?.symbol?.name?.toLowerCase() == parentName?.toLowerCase())
+
+		parentType = parentSymbol?.type?.symbol?.name ?? parentSymbol?.symbol?.name;
+	}
 	
 	for(const item of allSymbols) {
 		const symbol = item.symbol;
 
-		if(symbol.name.toLowerCase() !== word.toLowerCase()){
+		if(symbol?.name?.toLowerCase() !== word?.toLowerCase()){
 			continue;
 		}
 
 		// We have a parent but the candidate doesn't
-		if(parentName && !parentSymbol?.set) {
+		if(parentName && !item?.parentName) {
 			continue;
 		}
 
 		// We have a parent name but the candidate doesn't match
-		if(parentName && item.parentName.toLowerCase() != parentSymbol?.set.toLowerCase()) {
+		if(parentName && item?.parentName?.toLowerCase() != parentType?.toLowerCase()) {
 			continue;
 		}
 
@@ -499,7 +539,7 @@ export function getDocumentMarkdown(symbol: AspSymbol): string {
 	}
 
 	if (symbol.documentation?.returnSummary) {
-		text += `\n\n _@returns_ \`${symbol.documentation?.returnType}\` — ${symbol.documentation?.returnSummary}`
+		text += `\n\n _@returns_ \`${symbol?.documentation?.returnType}\` — ${symbol.documentation?.returnSummary}`
 	}
 
 	return text;
@@ -531,33 +571,38 @@ export function getParentOfMember(doc: TextDocument, position: Position): string
 	return doc.getText(precedingWordRange);
 }
 
-export function getComMembers(progID: string) : Promise<AspSymbol[]> {
+export function getSymbolFromAssignment(symbol: AspSymbol, allSymbols: AspSymbol[]): AspSymbol {
+	if (!symbol.assign)
+		return;
 
-	return new Promise((resolve, reject) => {
-		exec(`powershell -Command \"$com = New-Object -Com '${progID}'; $com | Get-Member | Select-Object Name, MemberType, Definition | ConvertTo-Json -Depth 2; [System.Runtime.InteropServices.Marshal]::ReleaseComObject($com) | Out-Null\"`, (error, stdout, stderr) => {
-			let membersMap: ComGetMembers[] = JSON.parse(stdout);
+	const matches: RegExpExecArray = PATTERNS.VAR_ASSIGNMENT.exec(symbol.assign);
 
-			resolve(membersMap.map(e => {
-					let symbol: AspSymbol = {
-						isTopLevel: true,
-						sourceFile: "",
-						sourceFilePath: "",
-						isBuiltIn: true,
+	if (!matches)
+		return;
 
-						symbol: {
-							name: e.Definition,
-							detail: null,
-							kind: SymbolKind.Function,
-							range: null,
-							selectionRange: null,
-							children: []
-						}
-					};
+	let parent = matches[1];
+	let func = matches[2];
 
-					return symbol;
-				}))
-		})
-	})
+	//Find the parent, is this parent a class, or a variable?
+	//If it's a variable, change the parent to its type.
+	let parentSymbol = allSymbols.findLast(e => e?.symbol?.name?.toLowerCase() == parent?.toLowerCase());
+
+	if (parentSymbol?.type)
+		parent = parentSymbol?.type?.symbol?.name;
+	
+	//Get the return type of the func, then find the type of the func in the symbols.
+	let funcSymbol = allSymbols.findLast(e => e?.symbol?.name?.toLowerCase() == func?.toLowerCase() && (!parent || e?.parentName?.toLowerCase() == parent?.toLowerCase()));
+
+	let returnType = funcSymbol?.documentation?.returnType;
+
+	if (returnType) {
+		if (returnType.toLowerCase() == "com")
+			returnType = comMappings.find(e => e.progID.toLowerCase() == matches[3]?.toLowerCase())?.objectName
+
+		return allSymbols.findLast(e => e?.symbol?.name?.toLowerCase() == returnType?.toLowerCase() && e?.symbol?.kind == SymbolKind.Class);
+	}
+
+	return funcSymbol?.type;
 }
 
 export default languages.registerDocumentSymbolProvider(

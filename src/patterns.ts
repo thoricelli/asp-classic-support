@@ -27,7 +27,7 @@ export const FUNCTION = /((?:^[\t ]*'+.*$(?:\r\n|\n))*)^[\t ]*((?:(?:Public|Priv
  * 
  * [Link](https://regex101.com/r/j2BtJ6/1)
  */
-export const CLASS = /((?:^[\t ]*'+.*$(?:\r\n|\n))*)^[\t ]*((?:(?:Public|Private)[\t ]+)?Class[\t ]+(\[?[a-z]\w*\]?))/img;
+export const CLASS = /((?:^[\t ]*'+.*$(?:\r\n|\n))*)^[\t ]*((?:(?:Public|Private)[\t ]+)?Class[\t ]+(\[?[a-z]\w.*\]?))/img;
 
 /**
  * Matches a Property
@@ -41,14 +41,21 @@ export const CLASS = /((?:^[\t ]*'+.*$(?:\r\n|\n))*)^[\t ]*((?:(?:Public|Private
 export const PROP = /((?:^[\t ]*'+.*$(?:\r\n|\n))*)^[\t ]*((?:Public[\t ]+(?:Default[\t ]+)?|Private[\t ]+)?Property[\t ]+(Get|Let|Set)[\t ]+(\[?[a-z]\w*\]?))(?:\((.*)\))?/img;
 
 /**
+ * Matches a public member of a class
+ * 1. Name
+ */
+export const MEMBER = /Public+[\t ](\S+)$/im;
+
+/**
  * Matches a Variable Declaration
  * 
  * 1. Type
  * 2. Name (cs)
+ * 3. new Object => Object
+ * 4. The value / call assigned to the variable.
  */
 // export const VAR = /(?<!'\s*)(?:^|:)[\t ]*(Dim|Set|Const|Private[\t ]+Const|Public[\t ]+Const|Private|Public)[\t ]+(?!Sub|Function|Class|Property)([a-z0-9_]+(?:[\t ]*\([\t ]*\d*[\t ]*\))?(?:[\t ]*,[\t ]*[a-z0-9_]+(?:[\t ]*\([\t ]*\d*[\t ]*\))?)*)[\t ]*.*(?:$|:)/img;
-export const VAR = /(?<!'\s*)(?:^|:)[\t ]*(Dim|Set|Const|Private[\t ]+Const|Public[\t ]+Const|Private|Public)[\t ]+(?!Sub|Function|Property)([a-z0-9_]+(?:[\t ]*\([\t ]*\d*[\t ]*\))?(?:[\t ]*,[\t ]*[a-z0-9_]+(?:[\t ]*\([\t ]*\d*[\t ]*\))?)*)[\t ]*(?:=[\t ]*(?:New[\t ]+)?([a-z0-9_]+)(?=\.|\s|$))?.*(?:$|:)/img;
-
+export const VAR = /(?<!'\s*)(?:^|:)[\t ]*(?:(Dim|Set|Const|Private[\t ]+Const|Public[\t ]+Const|Private|Public)[\t ]+)?(?!Sub|Function|Property)([a-z0-9_]+(?:[\t ]*\([\t ]*\d*[\t ]*\))?(?:[\t ]*,[\t ]*[a-z0-9_]+(?:[\t ]*\([\t ]*\d*[\t ]*\))?)*)[\t ]*(?:=[\t ]*)(?:New[\t ]+([a-z_]*)|(.+?)(?:\s*"."|$))?.*(?:$|:)/gmi
 export const VAR_COMPLS = /^[\t ]*(Dim|Const|((Private|Public)[\t ]+)?(Function|Sub|Class|Property [GLT]et))[\t ]+\w+[^:]*$/i; // fix: should again after var name #22
 
 /**
@@ -115,10 +122,25 @@ export const COLOR = /\b(vbBlack|vbBlue|vbCyan|vbGreen|vbMagenta|vbRed|vbWhite|v
  * 1) Opening tag
  * 2) Closing tag 
  */
-export const ASP_BRACKETS = /(<%=|<%|%>)/g;
+export const ASP_BRACKETS = /(<%=|<%|%>|<script.*runat=.*Server.*|<\/script>)/gi;
+
+/**
+ * Check for <!-- #, the user might be trying to type an include.
+ */
+export const HTML_COMMENT_INCLUDE = /(<!--\s*#)/i
+export const HTML_COMMENT_INCLUDE_TYPE = /(<!--\s*#include\s)/i
+export const HTML_COMMENT_INCLUDE_FILE = /(<!--\s*#include\s(?:file|virtual)=")(.*)"/i
 
 /** Matches lines which can be thrown away in informal doc comments like:
  * 
  * '********** 
  */
 export const DOC_SEPARATOR = /['\*\s-]+$/
+
+/**
+ * Extracts parent, accessor and (optionally COM type)
+ * 1. Parent (if any)
+ * 2. Function or accessor call
+ * 3. Any string in function call (for COM processing)
+ */
+export const VAR_ASSIGNMENT = /^(?:([a-zA-Z_]*)\.)?([a-zA-Z_]*)\s*\(\s*(?:"([^"]*)")?/im

@@ -1,10 +1,20 @@
-import { sign } from "crypto";
-import { languages, SignatureHelp, SignatureInformation, ParameterInformation,
-  TextDocument, Position, SignatureHelpContext, CancellationToken, MarkdownString } from "vscode";
+import {
+	CancellationToken,
+	languages,
+	MarkdownString,
+	ParameterInformation,
+	Position,
+	SignatureHelp,
+	SignatureHelpContext,
+	SignatureInformation,
+	SymbolKind,
+	TextDocument
+} from "vscode";
+import syntaxSymbols from "./definitions";
+import comMappings from "./definitions/com_mappings.json";
 import { builtInSymbols } from "./extension";
-import * as PATTERNS from "./patterns";
 import { positionIsInsideAspRegion } from "./region";
-import { currentDocSymbols, getDocumentMarkdown, getParentOfMember } from "./symbols";
+import { currentDocSymbols, getParentOfMember } from "./symbols";
 
 /**
  * Reduces a partial line of code to the current Function for parsing
@@ -108,7 +118,9 @@ function provideSignatureHelp(doc: TextDocument, position: Position, _token: Can
   let candidateSignatures: SignatureInformation[] | undefined;
 
 	// Get candidate signatures for the caller.func name from all symbols
-	const allSymbols = new Set([...builtInSymbols, ...currentDocSymbols(doc.fileName)]);
+	const allSymbols = [...builtInSymbols, ...currentDocSymbols(doc.fileName), ...syntaxSymbols];
+
+	const varSymbol = allSymbols.find(e => e.symbol.name.toLowerCase() == caller.parent.toLowerCase());
 
 	for(const symbol of allSymbols) {
 
@@ -125,7 +137,7 @@ function provideSignatureHelp(doc: TextDocument, position: Position, _token: Can
 			continue;
 		}
 
-		if(caller.parent && symbol.parentName && caller.parent.toLowerCase() !== symbol.parentName.toLowerCase()) {
+		if(caller.parent && symbol.parentName && symbol.parentName.toLowerCase() !== varSymbol?.symbol?.name?.toLowerCase()) {
 			continue;
 		}
 

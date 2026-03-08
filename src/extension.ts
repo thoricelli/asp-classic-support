@@ -68,9 +68,11 @@ export function activate(context: ExtensionContext): void {
 
 		var functionIncludesFile = context.asAbsolutePath("./definitions/__functions.asp");
 		var objectIncludesFile = context.asAbsolutePath("./definitions/__objects.asp");
+		var adoIncludesFile = context.asAbsolutePath("./definitions/__ado.asp");
 
 		includes.set("Global", new IncludeFile(functionIncludesFile));
 		includes.set("ObjectDefs", new IncludeFile(objectIncludesFile));
+		includes.set("Ado", new IncludeFile(adoIncludesFile));
 
 		addRegionHighlights(context);
 

@@ -1,21 +1,21 @@
-import { languages, CompletionItem, CompletionItemKind, TextDocument, Position, SymbolKind, DocumentSymbol, Uri, commands, MarkdownString, CompletionList } from "vscode";
-import { builtInSymbols, output } from "./extension"
+import { CancellationToken, CompletionContext, CompletionItem, CompletionItemKind, CompletionList, DocumentSymbol, languages, MarkdownString, Position, SymbolKind, TextDocument } from "vscode";
+import syntaxSymbols from "./definitions";
+import { builtInSymbols, output } from "./extension";
 import * as PATTERNS from "./patterns";
-import { currentDocSymbols, getDocsForLine } from "./symbols";
 import { getRegionsInsideRange, positionIsInsideAspRegion, replaceCharacter } from "./region";
-import { should } from "chai";
-import completions from "./definitions";
+import { currentDocSymbols, INCLUDE_SYMBOL, INCLUDE_TYPES } from "./symbols";
 import { AspSymbol } from "./types";
 
 
-function getObjectMembers(doc: TextDocument, objectName: string): AspSymbol[] {
+async function getObjectMembers(doc: TextDocument, objectName: string): Promise<AspSymbol[]> {
   const allSymbols = [...currentDocSymbols(doc.fileName), ...builtInSymbols];
 
   let objectSymbol = allSymbols.find(e => e?.symbol?.name?.toLowerCase() == objectName.toLowerCase());
 
-  if (objectSymbol.set) {
-    objectSymbol = allSymbols.find(e => e?.symbol?.name?.toLowerCase() == objectSymbol?.set.toLowerCase())
-  }
+  let objectType = objectSymbol.type;
+
+  if (objectType)
+    objectSymbol = allSymbols.find(e => e?.symbol?.name?.toLowerCase() == objectType?.symbol?.name?.toLowerCase() && e?.symbol?.kind == SymbolKind.Class);
 
   //TODO: Replace with children.
   return allSymbols.filter(e => e?.parentName?.toLowerCase() == objectSymbol?.symbol?.name?.toLowerCase() && e.sourceFilePath == objectSymbol.sourceFilePath);
@@ -39,24 +39,41 @@ function getCompletionFromSymbol(aspSymbol: AspSymbol): CompletionItem {
   if(symbol.kind === SymbolKind.Property) kind = CompletionItemKind.Property;
   if(symbol.kind === SymbolKind.Function) kind = CompletionItemKind.Function;
   if(symbol.kind === SymbolKind.Class) kind = CompletionItemKind.Class;
+  if (symbol.kind == SymbolKind.Operator) kind = CompletionItemKind.Operator;
+  if (symbol.kind == SymbolKind.Key) kind = CompletionItemKind.Keyword;
 
   let completionSymbol = new CompletionItem(symbol.name, kind);
   completionSymbol.detail = aspSymbol.definition;
 
+  completionSymbol.documentation = aspSymbol?.documentation?.summary;
+
   return completionSymbol;
 }
 
-function provideCompletionItems(doc: TextDocument, position: Position): CompletionList {
+async function provideCompletionItems(doc: TextDocument, position: Position): Promise<CompletionList> {
 
   const regionTest = positionIsInsideAspRegion(doc, position);
 
-  // We're not in ASP, exit
-  if(!regionTest.isInsideRegion) {
-    return new CompletionList([], false);
-  }
-
   const line = doc.lineAt(position);
   let lineText = line.text;
+
+    // We're not in ASP, exit
+  if(!regionTest.isInsideRegion) {
+
+    // Check for <!-- #include file="" or <!-- #include virtual=""
+
+    // Check for <!-- #include
+    if (PATTERNS.HTML_COMMENT_INCLUDE_TYPE.exec(lineText)) {
+      return new CompletionList(INCLUDE_TYPES, false)
+    }
+
+    // Check for #
+    if (PATTERNS.HTML_COMMENT_INCLUDE.exec(lineText)) {
+      return new CompletionList([INCLUDE_SYMBOL], false);
+    }
+
+    return new CompletionList([], false);
+  }
 
   // Remove completion offerings from commented lines
   if (line.text.charAt(line.firstNonWhitespaceCharacterIndex) === "'") {
@@ -123,9 +140,7 @@ function provideCompletionItems(doc: TextDocument, position: Position): Completi
 
     const objectName = dotTypedMatch[1];
 
-    output.appendLine(`Dot typed for object: ${objectName}`);
-
-    const classAspSymbols: AspSymbol[] = getObjectMembers(doc, objectName);
+    const classAspSymbols: AspSymbol[] = await getObjectMembers(doc, objectName);
 
     if (classAspSymbols.length <= 0)
       return new CompletionList([], false);
@@ -159,7 +174,7 @@ function provideCompletionItems(doc: TextDocument, position: Position): Completi
     }
   }
 
-  results.push(...completions)
+  results.push(...syntaxSymbols.map(e => getCompletionFromSymbol(e)))
 
   return new CompletionList(results, true);
 
@@ -218,5 +233,5 @@ function provideCompletionItems(doc: TextDocument, position: Position): Completi
 
 export default languages.registerCompletionItemProvider(
   { scheme: "file", language: "asp" },
-  { provideCompletionItems }, "."
+  { provideCompletionItems }, ".", "#"
 );

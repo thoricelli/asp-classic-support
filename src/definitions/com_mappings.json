@@ -1,0 +1,18 @@
+[
+  {
+    "progID": "ADODB.Connection",
+    "objectName": "Connection"
+  },
+  {
+    "progID": "ADODB.Recordset",
+    "objectName": "Recordset"
+  },
+  {
+    "progID": "ADODB.Command",
+    "objectName": "Command"
+  },
+  {
+    "progID": "Scripting.FileSystemObject",
+    "objectName": "FileSystemObject"
+  }
+]

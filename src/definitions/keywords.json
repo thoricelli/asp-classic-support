@@ -32,7 +32,22 @@
   "Else": {
     "documentation": ""
   },
-  "End": {
+  "End If": {
+    "documentation": ""
+  },
+  "End Property": {
+    "documentation": ""
+  },
+  "End Sub": {
+    "documentation": ""
+  },
+  "End Function": {
+    "documentation": ""
+  },
+  "End Class": {
+    "documentation": ""
+  },
+  "End Select": {
     "documentation": ""
   },
   "Erase": {

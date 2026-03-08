@@ -216,109 +216,148 @@ Class Folder
 End Class
 
 
+
 Class FileSystemObject
 
-	Function BuildPath(path, name) ' As String
-	End Function
+  ''' <summary>Appends a name to an existing path</summary>
+  ''' <param name="Path">Required. The path to append a name to</param>
+  ''' <param name="Name">Required. The name to append to the path</param>
+  Function BuildPath(Path, Name)
+  End Function
 
-	Sub CopyFile(source, destination)
-	End Sub
-	Sub CopyFile(source, destination, overwrite)
-	End Sub
+  ''' <summary>Copies one or more files from one location to another</summary>
+  ''' <param name="Source">Required. The file or files to copy (wildcards can be used}</param>
+  ''' <param name="Destination">Required. Where to copy the file or files (wildcards cannot be used}</param>
+  ''' <param name="Overwrite">Optional. A Boolean value that specifies whether an existing file can be overwritten. True allows existing files to be overwritten and False prevents existing files from being overwritten. Default is True</param>
+  Function CopyFile(Source, Destination, Overwrite)
+  End Function
 
-	Sub CopyFolder(source, destination)
-	End Sub
-	Sub CopyFolder(source, destination, overwrite)
-	End Sub
+  ''' <summary>Copies one or more folders from one location to another</summary>
+  ''' <param name="Source">Required. The folder or folders to copy (wildcards can be used)</param>
+  ''' <param name="Destination">Required. Where to copy the folder or folders (wildcards cannot be used)</param>
+  ''' <param name="Overwrite">Optional. A Boolean value that indicates whether an existing folder can be overwritten. True allows existing folders to be overwritten and False prevents existing folders from being overwritten. Default is True</param>
+  Function CopyFolder(Source, Destination, Overwrite)
+  End Function
 
-	Function CreateFolder(foldername) ' As Folder
-	End Function
+  ''' <summary>Creates a new folder</summary>
+  ''' <param name="Name">Required. The name of the folder to create</param>
+  Function CreateFolder(Name)
+  End Function
 
-	Function CreateTextFile(filename) ' As TextStream
-	End Function
-	Function CreateTextFile(filename, overwrite) ' As TextStream
-	End Function
-	Function CreateTextFile(filename, overwrite, unicode) ' As TextStream
-	End Function
+  ''' <summary>Creates a text file and returns a TextStream object that can be used to read from, or write to the file</summary>
+  ''' <param name="Filename">Required. The name of the file to create</param>
+  ''' <param name="Overwrite">Optional. A Boolean value that indicates whether an existing file can be overwritten. True indicates that the file can be overwritten and False indicates that the file can not be overwritten. Default is True</param>
+  ''' <param name="Unicode">Optional. A Boolean value that indicates whether the file is created as a Unicode or an ASCII file. True indicates that the file is created as a Unicode file, False indicates that the file is created as an ASCII file. Default is False</param>
+  Function CreateTextFile(FileName, Overwrite, Unicode)
+  End Function
 
-	Sub DeleteFile(filename)
-	End Sub
-	Sub DeleteFile(filename, force)
-	End Sub
+  ''' <summary>Deletes one or more specified files</summary>
+  ''' <param name="FileName">Required. The name of the file or files to delete (Wildcards are allowed)</param>
+  ''' <param name="Force">Optional. A Boolean value that indicates whether read-only files will be deleted. True indicates that the read-only files will be deleted, False indicates that they will not be deleted. Default is False</param>
+  Function DeleteFile(FileName, Force)
+  End Function
 
-	Sub DeleteFolder(filename)
-	End Sub
-	Sub DeleteFolder(filename, force)
-	End Sub
+  ''' <summary>Deletes one or more specified folders</summary>
+  ''' <param name="FolderName">Required. The name of the folder or folders to delete (Wildcards are allowed)</param>
+  ''' <param name="Force">Optional. A Boolean value that indicates whether read-only folders will be deleted. True indicates that read-only folders will be deleted, False indicates that they will not be deleted. Default is False </param>
+  Function DeleteFolder(FolderName, Force)
+  End Function
 
-	Property Get Drives ' As DriveCollection
-	End Property
+  ''' <summary>Checks if a specified drive exists</summary>
+  ''' <param name="Drive">Required. A drive letter or a complete path specification</param>
+  Function DriveExists(Drive)
+  End Function
 
-	Function DriveExists(drive) ' As Boolean
-	End Function
+  ''' <summary>Checks if a specified file exists</summary>
+  ''' <param name="FileName">Required. The name of the file to check if exist</param>
+  Function FileExists(FileName)
+  End Function
 
-	Function FileExists(filename) ' As Boolean
-	End Function
+  ''' <summary>Checks if a specified folder exists</summary>
+  ''' <param name="FolderName">Required. The name of the folder to check if exist</param>
+  Function FolderExists(FolderName)
+  End Function
 
-	Function FolderExists(foldername) ' As Boolean
-	End Function
+  ''' <summary>Returns the complete path from the root of the drive for the specified path</summary>
+  ''' <param name="Path">Required. The path to change to a complete path</param>
+  Function GetAbsolutePathName(Path)
+  End Function
 
-	Function GetAbsolutePathName(path) ' As String
-	End Function
+  ''' <summary>Returns the base name of a specified file or folder</summary>
+  ''' <param name="Path">Required. The path for the file or folder whose base name is to be returned</param>
+  Function GetBaseName(Path)
+  End Function
 
-	Function GetBaseName(path) ' As String
-	End Function
+  ''' <summary>Returns a Drive object corresponding to the drive in a specified path</summary>
+  ''' <param name="DriveSpec">Required. Can be a drive letter (c), or a drive letter followed by a colon (c:), or a drive letter followed by a colon and path separator (c:\), or any network share specification (\\computer2\share1)</param>
+  Function GetDrive(DriveSpec)
+  End Function
 
-	Function GetDrive(drive) ' As Drive
-	End Function
+  ''' <summary>Returns the drive name of a specified path</summary>
+  ''' <param name="Path">Required. The path that will return a drive name</param>
+  Function GetDriveName(Path)
+  End Function
 
-	Function GetDriveName(drive) ' As String
-	End Function
+  ''' <summary>Returns the file extension name for the last component in a specified path</summary>
+  ''' <param name="Path">Required. The path for the file whose file extension name is to be returned</param>
+  Function GetExtensionName(Path)
+  End Function
 
-	Function GetExtensionName(path) ' As String
-	End Function
+  ''' <summary>Returns a File object for a specified path</summary>
+  Function GetFile()
+  End Function
 
-	Function GetFile(filename) ' As File
-	End Function
+  ''' <summary>Returns the file name or folder name for the last component in a specified path</summary>
+  ''' <param name="Path">Required. The path to a specific file</param>
+  Function GetFileName(Path)
+  End Function
 
-	Function GetFileName(filename) ' As String
-	End Function
+  Function GetFileVersion()
+  End Function
 
-	Function GetFileVersion(filename) ' As String
-	End Function
+  ''' <summary>Returns a Folder object for a specified path</summary>
+  ''' <param name="Path">Required. The path to a specific folder</param>
+  Function GetFolder(Path)
+  End Function
 
-	Function GetFolder(foldername) ' As Folder
-	End Function
+  ''' <summary>Returns the name of the parent folder of the last component in a specified path</summary>
+  Function GetParentFolderName()
+  End Function
 
-	Function GetParentFolderName(foldername) ' As String
-	End Function
+  ''' <summary>Returns the path to some of Windows' special folders</summary>
+  ''' <param name="Path">Required. The path for the file or folder whose parent folder name is to be returned</param>
+  Function GetSpecialFolder(Path)
+  End Function
 
-	Function GetSpecialFolder(folderspec) ' As Folder
-	End Function
-	
-	Function GetStandardStream(StandardStreamType) ' As TextStream
-	End Function
-	Function GetStandardStream(StandardStreamType, Unicode) ' As TextStream
-	End Function
+  Function GetStandardStream()
+  End Function
 
-	Function GetTempName() ' As String
-	End Function
+  ''' <summary>Returns a randomly generated temporary file or folder</summary>
+  Function GetTempName()
+  End Function
 
-	Sub MoveFile(source, destination)
-	End Sub
+  ''' <summary>Moves one or more files from one location to another</summary>
+  ''' <param name="Source">Required. The path to the file/files to be moved. Can contain wildcard characters in the last component.</param>
+  ''' <param name="Destination">Required. Where to move the file/files. Cannot contain wildcard characters</param>
+  Function MoveFile(Source, Destination)
+  End Function
 
-	Sub MoveFolder(source, destination)
-	End Sub
+  ''' <summary>Moves one or more folders from one location to another</summary>
+  ''' <param name="Source">Required. The path to the folder/folders to be moved. Can contain wildcard characters in the last component.</param>
+  ''' <param name="Destination">Required. Where to move the folder/folders. Cannot contain wildcard characters</param>
+  Function MoveFolder(Source, Destination)
+  End Function
 
-	Function OpenTextFile(filename) ' As TextStream
-	End Function
-	Function OpenTextFile(filename, iomode) ' As TextStream
-	End Function
-	Function OpenTextFile(filename, iomode, create) ' As TextStream
-	End Function
-	Function OpenTextFile(filename, iomode, create, format) ' As TextStream
-	End Function
-	
+  ''' <summary>Opens a file and returns a TextStream object that can be used to access the file</summary>
+  ''' <param name="Source">Required. The path to the folder/folders to be moved. Can contain wildcard characters in the last component.</param>
+  ''' <param name="Destination">Required. Where to move the folder/folders. Cannot contain wildcard characters</param>
+  Function OpenTextFile(Source, Destination)
+  End Function
+
+  ''' <summary>Returns a collection of all Drive objects on the computer</summary>
+  Property Get Drives
+  End Property
+
 End Class
 
 
@@ -747,6 +786,7 @@ Class Server
 
 	''' <summary>The CreateObject method creates an instance of a server component. If the component has implemented the OnStartPage and OnEndPage methods, the OnStartPage method is called at this time.</summary>
 	''' <param name="progID">Specifies the type of object to create. The format for progID is [Vendor.] Component[ .Version].</param>
+	''' <returns type="COM">The COM object.</returns>
 	Function CreateObject(progID)
 	End Function
 
