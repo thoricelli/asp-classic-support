@@ -11,8 +11,11 @@ async function getObjectMembers(doc: TextDocument, objectName: string): Promise<
   const allSymbols = [...currentDocSymbols(doc.fileName), ...builtInSymbols];
 
   let objectSymbol = allSymbols.find(e => e?.symbol?.name?.toLowerCase() == objectName.toLowerCase() && e.sourceFilePath == doc.fileName);
+  
+  if (!objectSymbol)
+    objectSymbol = allSymbols.find(e => e?.symbol?.name?.toLowerCase() == objectName.toLowerCase());
 
-  let objectType = objectSymbol.type;
+  let objectType = objectSymbol?.type;
 
   if (objectType)
     objectSymbol = allSymbols.find(e => e?.symbol?.name?.toLowerCase() == objectType?.symbol?.name?.toLowerCase() && e?.symbol?.kind == SymbolKind.Class);

@@ -122,6 +122,9 @@ function provideSignatureHelp(doc: TextDocument, position: Position, _token: Can
 
 	const varSymbol = allSymbols.find(e => e.symbol.name.toLowerCase() == caller.parent.toLowerCase());
 
+	if (varSymbol?.type)
+		caller.parent = varSymbol.type?.symbol?.name;
+
 	for(const symbol of allSymbols) {
 
 		// Names don't match, continue
@@ -137,7 +140,7 @@ function provideSignatureHelp(doc: TextDocument, position: Position, _token: Can
 			continue;
 		}
 
-		if(caller.parent && symbol.parentName && symbol.parentName.toLowerCase() !== varSymbol?.symbol?.name?.toLowerCase()) {
+		if(caller.parent && symbol.parentName && symbol.parentName.toLowerCase() !== caller?.parent?.toLowerCase()) {
 			continue;
 		}
 

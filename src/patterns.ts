@@ -122,7 +122,8 @@ export const COLOR = /\b(vbBlack|vbBlue|vbCyan|vbGreen|vbMagenta|vbRed|vbWhite|v
  * 1) Opening tag
  * 2) Closing tag 
  */
-export const ASP_BRACKETS = /(<%=|<%|%>|<script.*runat=.*Server.*|<\/script>)/gi;
+//export const ASP_BRACKETS = /(<%=|<%|%>)/gi;
+export const ASP_BRACKETS = /(<%=|<%|%>)/gi;
 
 /**
  * Check for <!-- #, the user might be trying to type an include.
@@ -143,4 +144,4 @@ export const DOC_SEPARATOR = /['\*\s-]+$/
  * 2. Function or accessor call
  * 3. Any string in function call (for COM processing)
  */
-export const VAR_ASSIGNMENT = /^(?:([a-zA-Z_]*)\.)?([a-zA-Z_]*)\s*\(\s*(?:"([^"]*)")?/im
+export const VAR_ASSIGNMENT =  /(?:(\w+)\.)?(\w+)\(?"?(\w+\.\w+)?(?:\.\w+)?"?\)?.*$/im

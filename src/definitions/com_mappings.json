@@ -14,5 +14,25 @@
   {
     "progID": "Scripting.FileSystemObject",
     "objectName": "FileSystemObject"
+  },
+  {
+    "progID": "Msxml2.ServerXMLHTTP",
+    "objectName": "HttpRequest"
+  },
+  {
+    "progID": "ADODB.Stream",
+    "objectName": "Stream"
+  },
+  {
+    "progID": "CDO.Message",
+    "objectName": "Message"
+  },
+  {
+    "progID": "CDO.Configuration",
+    "objectName": "Configuration"
+  },
+  {
+    "progID": "Scripting.Dictionary",
+    "objectName": "Dictionary"
   }
 ]

@@ -436,4 +436,319 @@ Class Command
 
 End Class
 
+Class HttpRequest
+
+  ''' <summary>Specifies the function to be called, when the readyState property is changed</summary>
+  Public OnReadyStateChange
+
+  ''' <summary>	Reports the status of the request</summary>
+  Public ReadyState
+
+  ''' <summary>Represents the message body as a byte array.</summary>
+  Public ResponseBody
+
+  ''' <summary>Represents the message body as IStream.</summary>
+  Public ResponseStream
+
+  ''' <summary>Represents the message body as text.</summary>
+  Public ResponseText
+
+  ''' <summary>Returns the HTTP request status code of the request.</summary>
+  Public Status
+
+  ''' <summary>Terminates and closes the HttpRequest object</summary>
+  Function Abort()
+  End Function
+
+  ''' <summary>Reads the values of all the HTTP request headers</summary>
+  Function GetAllResponseHeaders()
+  End Function
+  
+  ''' <summary>Returns information about the requested transmission property</summary>
+  Function GetOption()
+  End Function
+
+  ''' <summary>Retrieves the value of a specific HTTP request header</summary>
+  Function GetResponseHeader()
+  End Function
+
+  ''' <summary>Sets the method, URL address and authentication information for the requested data transfer</summary>
+  ''' <param name="Method">Data transfer method (POST, GET, PUT, ...)</param>
+  ''' <param name="Url">Data source valid URL address</param>
+  ''' <param name="Async">Data transfer type asynchronous/synchronous (true = asynchronous)</param>
+  ''' <param name="User">Authentication by name</param>
+  ''' <param name="Password">Authentication by password</param>
+  Function Open(Method, Url, Async, User, Password)
+  End Function
+
+  ''' <summary>Sends an HTTP request to the server.</summary>
+  ''' <param name="VarBody">Sent data in case of using POST method in the open method.</param>
+  Function Send(VarBody)
+  End Function
+
+  ''' <summary>Sets the requested transmission property</summary>
+  ''' <param name="NOption">Options available for the setOption method.</param>
+  ''' <param name="VVal">The value of the desired setting</param>
+  Function SetOption(NOption, VVal)
+  End Function
+
+  ''' <summary>	Specifies proxy settings</summary>
+  ''' <param name="ProxySetting"></param>
+  ''' <param name="VarProxyServer"></param>
+  ''' <param name="VarBypassList"></param>
+  Function SetProxy(ProxySetting, VarProxyServer, VarBypassList)
+  End Function
+
+  ''' <summary>Specify proxy authentication credentials.</summary>
+  ''' <param name="Username">The user name to be authenticated.</param>
+  ''' <param name="Password">The password for the user to be authenticated.</param>
+  Function SetProxyCredentials(Username, Password)
+  End Function
+
+  ''' <summary>Retrieves the value of a specific HTTP request header.</summary>
+  ''' <param name="SHeader">Header name (for example: "Content-Type").</param>
+  ''' <param name="SValue">Header value (for example: "text/xml; charset=utf-8").</param>
+  Function SetRequestHeader(SHeader, SValue)
+  End Function
+
+  ''' <summary>Specifies timeout settings for resolving the domain name, establishing the connection to the server, sending the data, and receiving the response.</summary>
+  ''' <param name="ResolveTimout">The value is applied to mapping host names (for example "www.microsoft.com") to IP addresses</param>
+  ''' <param name="ConnectTimeout">The value is applied to establishing a communication socket with the target server. The default value is 60 seconds.</param>
+  ''' <param name="SendTimeout">The value applies to sending an individual packet of the request data (if any) on the communication socket to the target server. </param>
+  ''' <param name="ReceiveTimeout">The value applies to receive a packet of response data from the target server.</param>
+  Function SetTimeouts(ResolveTimout, ConnectTimeout, SendTimeout, ReceiveTimeout)
+  End Function
+
+  ''' <summary>Allows to suspend execution the requesting server while waiting for an asynchronous send operation to complete.</summary>
+  ''' <param name="TimeoutInSeconds">Specifies the number seconds to wait for an asynchronous send operation to complete.</param>
+  Function WaitForResponse(TimeoutInSeconds)
+  End Function
+End Class
+
+Class Stream
+  ''' <summary>Sets or returns a value that specifies into which character set the contents are to be translated. This property is only used with text Stream objects (type is adTypeText)</summary>
+  Public CharSet
+  ''' <summary>Returns whether the current position is at the end of the stream or not</summary>
+  Public EOS
+  ''' <summary>Sets or returns the line separator character used in a text Stream object</summary>
+  Public LineSeperator
+  ''' <summary> Sets or returns the available permissions for modifying data</summary>
+  Public Mode
+  ''' <summary>Sets or returns the current position (in bytes) from the beginning of a Stream object</summary>
+  Public Position
+  ''' <summary>Returns the size of an open Stream object</summary>
+  Public Size
+  ''' <summary>Returns a value describing if the Stream object is open or closed</summary>
+  Public State
+  ''' <summary>Sets or returns the type of data in a Stream object</summary>
+  Public Type
+
+  ''' <summary>Cancels an execution of an Open call on a Stream object</summary>
+  Public Function Cancel()
+  End Function
+
+  ''' <summary>Closes a Stream object</summary>
+  Public Function Close()
+  End Function
+
+  ''' <summary>Copies a specified number of characters/bytes from one Stream object into another Stream object</summary>
+  ''' <param name="Dest">Required. Where to copy the Stream (contains a reference to an open Stream object) </param>
+  ''' <param name="NumChars">Optional. An integer that specifies the number of characters or bytes to be copied from the current position in the source Stream to the destination Stream. Default is -1 (will copy all data from the current position to EOS)</param>
+  Public Function CopyTo(Dest, NumChars)
+  End Function
+
+  ''' <summary>Sends the contents of the Stream buffer to the associated underlying object</summary>
+  Public Function Flush()
+  End Function
+
+  ''' <summary>Loads the contents of a file into a Stream object</summary>
+  ''' <param name="Filename"></param>
+  Public Function LoadFromFile(Filename)
+  End Function
+
+  ''' <summary>The Open method is used to open a Stream object. </summary>
+  ''' <param name="Source">Optional. The data source for the Stream object (a URL that points to an existing node in a tree structure, like an e-mail or file system or a reference to an already opened Record object). If source is not specified, a new Stream object, with a size of zero, will be created and opened</param>
+  ''' <param name="Mode">Optional. A ConnectModeEnum value that specifies the access mode for a Stream object. Default is adModeUnknown </param>
+  ''' <param name="Opt">Optional. A StreamOpenOptionsEnum value that specifies options for opening a Stream object. Default is adOpenStreamUnspecified </param>
+  ''' <param name="Username">Optional. A name of a user who can access the Stream object. If Source is an already opened Record, this parameter is not specified </param>
+  ''' <param name="Password">Optional. A password that validates the username. If Source is an already opened Record, this parameter is not specified </param>
+  Public Function Open(Source, Mode, Opt, Username, Password)
+  End Function
+
+  ''' <summary>Reads the entire stream or a specified number of bytes from a binary Stream object</summary>
+  ''' <param name="NumBytes">Optional. The number of bytes to read from the file, or a StreamReadEnum value. Default is adReadAll</param>
+  Public Function Read(NumBytes)
+  End Function
+
+  ''' <summary>Reads the entire stream, a line, or a specified number of characters from a text Stream object</summary>
+  ''' <param name="NumChars">Optional. The number of characters to read from the file, or a StreamReadEnum value. Default is adReadAll </param>
+  Public Function ReadText(NumChars)
+  End Function
+
+  ''' <summary>Reads the entire stream, a line, or a specified number of characters from a text Stream object</summary>
+  ''' <param name="FileName">Required. The name of the file to save the contents of the Stream object</param>
+  ''' <param name="Option">Optional. A SaveOptionsEnum value that specifies whether a file should be created if it does not exist or overwritten. Default is adSaveCreateNotExist. </param>
+  Public Function SaveToFile(FileName, Option)
+  End Function
+
+  ''' <summary>Sets the current position to be the end of the stream (EOS)</summary>
+  Public Function SetEOS()
+  End Function
+
+  ''' <summary>Skips a line when reading a text Stream</summary>
+  Public Function SkipLine()
+  End Function
+
+  ''' <summary>The Write method is used to write binary data to a binary Stream object.</summary>
+  ''' <param name="Buffer">Required. An array of bytes to be written to a binary Stream object </param>
+  Public Function Write(Buffer)
+  End Function
+
+  ''' <summary>Writes character data to a text Stream object</summary>
+  ''' <param name="Data">Required. The text to be written to a text Stream object </param>
+  ''' <param name="Opt">Optional. A StreamWriteEnum value that specifies whether a line separator must be added to the text</param>
+  Function WriteText(Data, Opt)
+  End Function
+End Class
+
+Class Message
+  ''' <summary>The Attachments property specifies the collection of attachments for this message. This property is read-only.</summary>
+  Public Attachments
+  ''' <summary>Indicates whether the TextBody of a message should automatically be generated from the contents of the HTMLBody property for a multipart/alternative message.</summary>
+  Public AutoGenerateTextBody
+  ''' <summary>The blind carbon copy (Bcc) recipients for this message.</summary>
+  Public BCC
+  ''' <summary>The IBodyPart interface on this object. This property is read-only.</summary>
+  Public BodyPart
+  ''' <summary>The informational carbon copy (Cc) recipients for this message.</summary>
+  Public CC
+  ''' <summary>The Configuration object for the message.</summary>
+  Public Configuration
+  ''' <summary>The IDataSource interface on this object. This property is read-only.</summary>
+  Public DataSource
+  ''' <summary>The Delivery Status Notification (DSN) options for the message.</summary>
+  Public DSNOptions
+  ''' <summary>The SMTP and Network News Transfer Protocol (NNTP) envelope fields of the message. This property is read-only.</summary>
+  Public EnvelopeFields
+  ''' <summary>The Fields collection for the object. This property is read-only.</summary>
+  Public Fields
+  ''' <summary>The newsgroups to which any responses to this message should be posted.</summary>
+  Public FollowUpTo
+  ''' <summary>The e-mail addresses of the principal author or authors of this message.</summary>
+  Public From
+  ''' <summary>The HTML representation of the message.</summary>
+  Public HTMLBody
+  ''' <summary>The BodyPart object containing the HTML representation of the message. This property is read-only.</summary>
+  Public HTMLBodyPart
+  ''' <summary>A list of keywords for this message.</summary>
+  Public Keywords
+  ''' <summary>Indicates whether a Mail Delivery Notification (MDN) report is requested for a message.</summary>
+  Public MDNRequested
+  ''' <summary>Indicates whether or not this message is to be formatted using the Multipurpose Internet Mail Extensions (MIME) formatting scheme.</summary>
+  Public MimeFormatted
+  ''' <summary>The newsgroup recipients for the message.</summary>
+  Public Newsgroups
+  ''' <summary>Contains a description of the organization to which the sender belongs.</summary>
+  Public Organization
+  ''' <summary>The date/time this message was delivered to the server. This property is read-only.</summary>
+  Public ReceivedTime
+  ''' <summary>The address to which replies should be sent.</summary>
+  Public ReplyTo
+  ''' <summary>The address of the user or agent that actually submits the message.</summary>
+  Public Sender
+  ''' <summary>The date/time this message was submitted to the server. This property is read-only.</summary>
+  Public SentOn
+  ''' <summary>The subject of the message.</summary>
+  Public Subject
+  ''' <summary>The plain text representation of the body of this message.</summary>
+  Public TextBody
+  ''' <summary>Returns a body part object containing the text content of this message. This property is read-only.</summary>
+  Public TextBodyPart
+  ''' <summary>Contains a list of principal (To) recipients for this message.</summary>
+  Public To
+
+  ''' <summary>Adds an attachment to this message.</summary>
+  ''' <param name="Url">The full path and file name of the message to be attached to this message.</param>
+  ''' <param name="UserName">An optional user name to use for authentication when retrieving the resource using HTTP. This name can be used to set the credentials for basic, NTLM, and Negotiate (Kerberos) authentication packages.</param>
+  ''' <param name="Password">An optional password to use for authentication when retrieving the resource using HTTP. This password can be used to set the credentials for basic, NTLM, and Negotiate (Kerberos) authentication packages.</param>
+  ''' <param name="PVal">Returned reference to an IBodyPart Interface.</param>
+  Function AddAttachment(Url, UserName, Password, PVal)
+  End Function
+
+  ''' <summary>The AddRelatedBodyPart method adds a BodyPart object that is referenced by content in the HTML body of the message.</summary>
+  ''' <param name="Url">The full path and file name of the resource to be associated with the new body part.</param>
+  ''' <param name="Reference">The Content-ID or Content-Location header that a rendering client can use to reference the new body part.</param>
+  ''' <param name="ReferenceType">The method of referencing the new body part. This parameter will determine which type of Content header is placed in this Multipurpose Internet Mail Extensions (MIME) subpart. The value is one of the CdoReferenceType Enum values.</param>
+  ''' <param name="UserName">An optional user name to use for authentication when retrieving the resource using HTTP. This name can be used to set the credentials for basic, NTLM, and Negotiate (Kerberos) authentication packages.</param>
+  ''' <param name="Password">An optional password to use for authentication when retrieving the resource using HTTP. This password can be used to set the credentials for basic, NTLM, and Negotiate (Kerberos) authentication packages.</param>
+  ''' <param name="PVal">Returned reference to an IBodyPart Interface.</param>
+  Function AddRelatedBodyPart(Url, Reference, ReferenceType, UserName, Password, PVal)
+  End Function
+
+  ''' <summary>The CreateMHTMLBody method converts the contents of an entire Web page into a MIME Encapsulation of Aggregate HTML Documents (MHTML) formatted message body.</summary>
+  ''' <param name="Url">The full path and file name of the Web page.</param>
+  ''' <param name="Flags">A bitmask of flags controlling inclusion of items from the Web page as related body parts. The flags are defined in the CdoMHTMLFlags Enum. The default value of Flags is CdoSuppressNone.</param>
+  ''' <param name="UserName">An optional user name to use for authentication when retrieving the resource using HTTP. This name can be used to set the credentials for basic, NTLM, and Negotiate (Kerberos) authentication packages.</param>
+  ''' <param name="Password">An optional password to use for authentication when retrieving the resource using HTTP. This password can be used to set the credentials for basic, NTLM, and Negotiate (Kerberos) authentication packages.</param>
+  Function CreateMHTMLBody(Url, Flags, UserName, Password)
+  End Function
+
+  ''' <summary>The Forward method creates and returns another message that can be used to forward this message.</summary>
+  ''' <param name="pVal">Returned reference to an IMessage Interface.</param>
+  Function Forward(pVal)
+  End Function
+
+  ''' <summary>Returns the specified dual interface on the object.</summary>
+  ''' <param name="Interface">The name of the interface to obtain.</param>
+  ''' <param name="PVal">Returned reference to the IDispatch Interface of the object.</param>
+  Function GetInterface(Interface, PVal)
+  End Function
+
+  ''' <summary>The GetStream method returns this message in serialized (wire-transport) format in a Microsoft ActiveX Data Objects (ADO) Stream object.</summary>
+  ''' <param name="PVal">Returned reference to the _Stream Interface of the object.</param>
+  Function GetStream(PVal)
+  End Function
+
+  ''' <summary>The Post method posts this message to the specified newsgroups.</summary>
+  Function Post()
+  End Function
+
+  ''' <summary>The PostReply method creates and returns another message that can be used to post a reply to this message.</summary>
+  ''' <param name="PVal">Returned reference to an IMessage Interface.</param>
+  Function PostReply(PVal)
+  End Function
+
+  ''' <summary>The Reply method creates and returns another message that can be used to reply to the sender of this message.</summary>
+  ''' <param name="PVal">Returned reference to an IMessage Interface.</param>
+  Function Reply(PVal)
+  End Function
+
+  ''' <summary>The ReplyAll method creates and returns another message that can be used to reply to the sender and all recipients.</summary>
+  ''' <param name="PVal">Returned reference to an IMessage Interface.</param>
+  Function ReplyAll(PVal)
+  End Function
+
+  ''' <summary>The Send method sends the message.</summary>
+  Function Send()
+  End Function
+End Class
+
+Class Configuration
+
+  ''' <summary>Returns the Fields object that contains the currently defined configuration settings. This property is read-only.</summary>
+  Public Property Get Fields(Name)
+  End Function
+
+  ''' <summary></summary>
+  ''' <param name="PVal">The name of the interface to obtain. The list of possible interfaces to return depends upon the Component Object Model (COM) class that provides the implementation.</param>
+  Function GetInterface(PVal)
+  End Function
+
+  ''' <summary>Loads the specified configuration.</summary>
+  ''' <param name="LoadFrom">Specifies what configuration to load. Can be any value from the following CdoConfigSource Enum.</param>
+  ''' <param name="Url">This parameter is ignored and reserved for future use.</param>
+  Function Load(LoadFrom, Url)
+  End Function
+End Class
+
 %>

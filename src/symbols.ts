@@ -438,7 +438,6 @@ async function provideDocumentSymbols(doc: TextDocument): Promise<DocumentSymbol
 
 		// Clear out the current doc symbols to reload them
 		currentDocSymbols(doc.fileName).clear();
-		
 		// Get the doc symbols of includes
 		await provideDocumentSymbolsForIncludes(doc, currentDocSymbols(doc.fileName));
 
@@ -503,6 +502,9 @@ export function getSymbolAtPosition(doc: TextDocument, position: Position): AspS
 		parentType = parentSymbol?.type?.symbol?.name ?? parentSymbol?.symbol?.name;
 	}
 	
+	//TODO: Hover does not know what it is hovering, a class, a variable, etc.
+	//Therefore it will return the wrong symbol (usually the first symbol that matches).
+
 	for(const item of allSymbols) {
 		const symbol = item.symbol;
 
